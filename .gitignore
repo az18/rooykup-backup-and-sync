@@ -1,0 +1,8 @@
+.env
+.idea*
+confp
+compressed/
+logs/
+path.json
+.dirignore
+test/
