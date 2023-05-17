@@ -1,6 +1,6 @@
 # rooykup - Backup and sync tool
 
-![IMG](https://img.shields.io/badge/Version-0.1.0-blue)
+![IMG](https://img.shields.io/badge/Version-0.0.1-blue)
 
 ## Table of Contents
 
