@@ -6,3 +6,5 @@ logs/
 path.json
 .dirignore
 test/
+/__pycache__/
+config.toml
