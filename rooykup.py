@@ -117,7 +117,7 @@ for p in toml_data['pathAndDirName']:
 	archive.close()
 
 	# Size of ZIP
-	size_final = os.path.getsize(zipName)/(1024*1024)
+	size_final = os.path.getsize("compressed/"+zipName)/(1024*1024)
 	out_str = f"- [x] {zipName} ({size_inital_mb:.1f}MB => {size_final:.1f}MB)"
 
 	print(out_str[:out_str.find("(")]+colorama.Fore.GREEN+out_str[out_str.find("("):]+colorama.Style.RESET_ALL)
@@ -137,7 +137,8 @@ except:
 	exit()
 
 try:
-	os.system(f"rclone sync {local+path_compressed} {remote} -P < {HOME}/.config/rooykup/confp")
+	config_pass = toml_data['config']['configPass']
+	os.system(f"echo {config_pass} | rclone sync {local+path_compressed} {remote} -P")
 except:
 	print(colorama.Fore.RED+"Error uploading to bipbop"+colorama.Style.RESET_ALL)
 
@@ -162,4 +163,4 @@ with open(f"logs/log-{str(today)}.md", 'a') as f:
 print("-"*30)
 
 if SHUTDOWN_AFTER:
-	os.system("shutdown")
+	os.system("shutdown now")
