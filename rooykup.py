@@ -1,4 +1,4 @@
-import json, toml
+import toml
 import colorama
 import zipfile
 import os, stat, argparse
@@ -60,7 +60,7 @@ if args.allways_create_zip:
 	ALLWAYS_CREATE_ZIP = not ALLWAYS_CREATE_ZIP
 
 if args.shutdown:
-	SHUTDOWN_AFTER = not ALLWAYS_CREATE_ZIP
+	SHUTDOWN_AFTER = not SHUTDOWN_AFTER
 
 # Functions
 def get_size(start_path):
