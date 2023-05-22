@@ -62,6 +62,22 @@ If you want to shut down your computer after the backup process, set `shutDownAf
 
 If you want to always compress the files, set `alwaysCompress` to `true` in your `config.toml` file or run it with the `-c` flag. This will compress even if the directory already has a compressed file from today.
 
+### Polybar module
+
+If you want to use the polybar module, add the following to your polybar config file:
+
+```ini
+[module/bs]
+type = custom/script
+exec = echo " "
+interval = 43200
+format-prefix = "  "
+format-prefix-foreground = #000
+format-background = #fb4934
+click-left = alacritty --hold -e python /path/to/rooykup.py -s
+```
+
+You can change the interval to whatever you want. The default is 12 hours (43200 seconds). Here I'm using `alacritty` as my terminal emulator, but you can change it to whatever you want.
 
 ## Contributing
 
