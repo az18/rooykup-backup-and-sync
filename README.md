@@ -70,7 +70,6 @@ If you want to use the polybar module, add the following to your polybar config 
 [module/bs]
 type = custom/script
 exec = echo " "
-interval = 43200
 format-prefix = "  "
 format-prefix-foreground = #000
 format-background = #fb4934
