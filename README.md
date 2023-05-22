@@ -76,7 +76,7 @@ format-background = #fb4934
 click-left = alacritty --hold -e python /path/to/rooykup.py -s
 ```
 
-You can change the interval to whatever you want. The default is 12 hours (43200 seconds). Here I'm using `alacritty` as my terminal emulator, but you can change it to whatever you want.
+Here I'm using `alacritty` as my terminal emulator, but you can change it to whatever you want.
 
 ## Contributing
 
