@@ -138,7 +138,11 @@ except:
 
 try:
 	config_pass = toml_data['config']['configPass']
-	os.system(f"echo {config_pass} | rclone sync {local+path_compressed} {remote} -P")
+
+	for r in remote:
+		os.system(f"echo {config_pass} | rclone sync {local+path_compressed} {r} -P")
+		print(colorama.Fore.GREEN+"[+] "+colorama.Style.RESET_ALL+"Uploaded to "+r)
+
 except:
 	print(colorama.Fore.RED+"Error uploading to bipbop"+colorama.Style.RESET_ALL)
 

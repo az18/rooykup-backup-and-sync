@@ -29,8 +29,9 @@
 workingDirectory = "/path/to/working/directory"
 shutDownAfterBackup = false
 alwaysCompress = false
-remote = "remote:folder"
+remote = ["remote:folder", "remote2:"]
 local = "local:"
+configPass = "here your super secure passphrase for rclone config" 
 
 [exclude]
 directories = [".git", "node_modules"] # If none leave it empty 
@@ -40,7 +41,7 @@ path = "/path/to/folder/to/backup"
 zipName = "NameOfTheZipFile
 
 [[pathAndDirName]]
-path = "/path/to/folder/to/backup"
+path = "/path/to/folder/to/backup2"
 zipName = "AnotherNameOfTheZipFile"
 ```
 
