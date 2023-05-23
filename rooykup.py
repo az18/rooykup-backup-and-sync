@@ -104,8 +104,8 @@ for p in toml_data['pathAndDirName']:
 		if os.path.isfile(is_file):
 			if check_if_file_was_created_today(is_file):
 				print(f"- [x] {zipName} "+colorama.Fore.GREEN+"(Already created today)"+colorama.Style.RESET_ALL)
-				with open(f"logs/log-{str(today)}.md", 'a') as f:
-					f.write(f"- [x] {zipName} (Already created today)\n")
+				#with open(f"logs/log-{str(today)}.md", 'a') as f:
+				#	f.write(f"- [x] {zipName} (Already created today)\n")
 				continue
 
 	archive = zipfile.ZipFile("compressed/"+zipName, "w")
@@ -113,7 +113,11 @@ for p in toml_data['pathAndDirName']:
 	for root, dirs, files in os.walk(source_dir):
 		dirs[:] = [d for d in dirs if d not in exclude]
 		for file in files:
-			archive.write(os.path.join(root, file))
+			try:
+				archive.write(os.path.join(root, file))
+			except:
+				print(colorama.Fore.RED+"[-] Error: "+colorama.Style.RESET_ALL+" Something went wrong with: "+file+"at "+root+" (Skipping)")
+				continue
 	archive.close()
 
 	# Size of ZIP
