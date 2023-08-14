@@ -144,11 +144,11 @@ try:
 	config_pass = toml_data['config']['configPass']
 
 	for r in remote:
-		os.system(f"echo {config_pass} | rclone sync {local+path_compressed} {r} -P")
+		os.system(f"echo {config_pass} | rclone copy {local+path_compressed} {r} -P")
 		print(colorama.Fore.GREEN+"[+] "+colorama.Style.RESET_ALL+"Uploaded to "+r)
 
 except:
-	print(colorama.Fore.RED+"Error uploading to bipbop"+colorama.Style.RESET_ALL)
+	print(colorama.Fore.RED+"Uploading error..."+colorama.Style.RESET_ALL)
 
 # End timer
 ended = time.time()
