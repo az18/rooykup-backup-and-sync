@@ -13,7 +13,7 @@ try:
 	if len(toml_data) == 0:
 		raise Exception("Config file is empty")
 except Exception as e:
-	print(RED+" ==> "+RESET+str(e))
+	print(RED+" ==> "+RESET_ALL+str(e))
 	exit()
 
 # Setting working directory

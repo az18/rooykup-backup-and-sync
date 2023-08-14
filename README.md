@@ -2,7 +2,7 @@
 
 ![EXAMPLE](rooykup_example.gif)
 
-![IMG](https://img.shields.io/badge/Version-0.0.1-blue)
+![IMG](https://img.shields.io/badge/Version-0.0.2-blue)
 
 ## Table of Contents
 
