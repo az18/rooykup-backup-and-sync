@@ -8,3 +8,5 @@ path.json
 test/
 /__pycache__/
 config.toml
+*.bin
+*build/
