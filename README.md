@@ -49,7 +49,7 @@ You can add as many `[[pathAndDirName]]` as you want.
 
 ## Usage
 
-- Run `python rooykup.py` to start the backup process
+- Run `python rooykup.py` (`./rooykup` if you download it from [release page](https://github.com/Rooyca/rooykup-backup-and-sync/releases)) to start the backup process
 - If you want to run it periodically, you can use `cron` or `systemd`
 
 You can also create an alias in your `.bashrc` file or `.zshrc` file
