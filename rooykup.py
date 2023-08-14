@@ -1,53 +1,11 @@
-import toml
-import colorama
 import zipfile
 import os, stat, argparse
 import datetime, time
 
-colorama.init()
+from colors import *
+from config import *
+
 today = datetime.date.today()
-HOME = os.getenv('HOME')
-
-if not os.path.exists(HOME+'/.config/rooykup'):
-	os.makedirs(HOME+'/.config/rooykup')
-
-# Import config file
-try:
-	with open(HOME+'/.config/rooykup/config.toml', 'r') as file:
-	    toml_data = toml.load(file)
-	if len(toml_data) == 0:
-		raise Exception("Config file is empty")
-except Exception as e:
-	print(colorama.Fore.RED+" ==> "+colorama.Style.RESET_ALL+str(e))
-	exit()
-
-# Setting working directory
-if toml_data['config']['workingDirectory']:
-	working_directory = toml_data['config']['workingDirectory']
-else:
-	if not os.path.exists(HOME+"/backup"):
-		os.makedirs(HOME+"/backup")
-	working_directory = HOME+"/backup"
-
-os.chdir(working_directory)
-
-# Setting variables
-if toml_data['config']['alwaysCompress']:
-	ALLWAYS_CREATE_ZIP = toml_data['config']['alwaysCompress']
-else:
-	ALLWAYS_CREATE_ZIP = False
-
-if toml_data['config']['shutDownAfterBackup']:
-	SHUTDOWN_AFTER = toml_data['config']['shutDownAfterBackup']
-else:
-	SHUTDOWN_AFTER = False
-
-# Creating folders if necessary
-if not os.path.exists("compressed"):
-	os.makedirs("compressed")
-
-if not os.path.exists("logs"):
-	os.makedirs("logs")
 
 # Parsing arguments
 parser = argparse.ArgumentParser(description='rooykup lets you backup and sync your data')
@@ -62,7 +20,11 @@ if args.allways_create_zip:
 if args.shutdown:
 	SHUTDOWN_AFTER = not SHUTDOWN_AFTER
 
-# Functions
+"""
+Functions
+
+"""
+
 def get_size(start_path):
 	total_size = 0
 	for dirpath, dirnames, filenames in os.walk(start_path):
@@ -74,7 +36,6 @@ def get_size(start_path):
 def check_if_file_was_created_today(file_path):
   stat_info = os.stat(file_path)
   creation_time = stat_info.st_ctime
-  today = datetime.date.today()
   return datetime.datetime.fromtimestamp(creation_time).date() == today
 
 # Start timer
@@ -89,7 +50,7 @@ for p in toml_data['pathAndDirName']:
 	# Check if directory is enty or not found
 	if size_initial == 0:
 		string_to_log = f"- [ ] {p['zipName']} (0MB) - Directory empty or not found"
-		print(string_to_log[:string_to_log.find("-")]+colorama.Fore.RED+string_to_log[string_to_log.find("-"):]+colorama.Style.RESET_ALL)
+		print(string_to_log[:string_to_log.find("-")]+RED+string_to_log[string_to_log.find("-"):]+RESET_ALL)
 		with open(f"logs/log-{str(today)}.md", 'a') as f:
 			f.write(string_to_log+"\n")
 		continue
@@ -103,7 +64,7 @@ for p in toml_data['pathAndDirName']:
 		is_file = "compressed/" + zipName
 		if os.path.isfile(is_file):
 			if check_if_file_was_created_today(is_file):
-				print(f"- [x] {zipName} "+colorama.Fore.GREEN+"(Already created today)"+colorama.Style.RESET_ALL)
+				print(f"- [x] {zipName} "+GREEN+"(Already created today)"+RESET_ALL)
 				#with open(f"logs/log-{str(today)}.md", 'a') as f:
 				#	f.write(f"- [x] {zipName} (Already created today)\n")
 				continue
@@ -116,7 +77,7 @@ for p in toml_data['pathAndDirName']:
 			try:
 				archive.write(os.path.join(root, file))
 			except:
-				print(colorama.Fore.RED+"[-] Error: "+colorama.Style.RESET_ALL+" Something went wrong with: "+file+"at "+root+" (Skipping)")
+				print(RED+"[-] Error: "+RESET_ALL+" Something went wrong with: "+file+"at "+root+" (Skipping)")
 				continue
 	archive.close()
 
@@ -124,7 +85,7 @@ for p in toml_data['pathAndDirName']:
 	size_final = os.path.getsize("compressed/"+zipName)/(1024*1024)
 	out_str = f"- [x] {zipName} ({size_inital_mb:.1f}MB => {size_final:.1f}MB)"
 
-	print(out_str[:out_str.find("(")]+colorama.Fore.GREEN+out_str[out_str.find("("):]+colorama.Style.RESET_ALL)
+	print(out_str[:out_str.find("(")]+GREEN+out_str[out_str.find("("):]+RESET_ALL)
 
 	with open(f"logs/log-{str(today)}.md", 'a') as f:
 		f.write(out_str+"\n")
@@ -137,7 +98,7 @@ try:
 	remote = toml_data['config']['remote']
 	local = toml_data['config']['local']
 except:
-	print(colorama.Fore.RED+"[-] Error"+colorama.Style.RESET_ALL+" - add 'remote' and 'local' to config file")
+	print(RED+"[-] Error"+RESET_ALL+" - add 'remote' and 'local' to config file")
 	exit()
 
 try:
@@ -145,10 +106,10 @@ try:
 
 	for r in remote:
 		os.system(f"echo {config_pass} | rclone copy {local+path_compressed} {r} -P")
-		print(colorama.Fore.GREEN+"[+] "+colorama.Style.RESET_ALL+"Uploaded to "+r)
+		print(GREEN+"[+] "+RESET_ALL+"Uploaded to "+r)
 
 except:
-	print(colorama.Fore.RED+"Uploading error..."+colorama.Style.RESET_ALL)
+	print(RED+"Uploading error..."+RESET_ALL)
 
 # End timer
 ended = time.time()
@@ -161,7 +122,7 @@ if time_elapsed > 60:
 	time_var = "minutes"
 
 print("-"*30)
-print(colorama.Fore.BLUE+" ==> "+f"Total time elapsed: {time_elapsed:.2f} {time_var}"+colorama.Style.RESET_ALL)
+print(BLUE+" ==> "+f"Total time elapsed: {time_elapsed:.2f} {time_var}"+RESET_ALL)
 
 with open(f"logs/log-{str(today)}.md", 'a') as f:
 	f.write("\n")
