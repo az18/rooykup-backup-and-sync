@@ -102,8 +102,7 @@ except:
 	exit()
 
 try:
-	config_pass = toml_data['config']['configPass']
-
+	config_pass = os.environ['RCLONE_CONFIG_PASS']
 	for r in remote:
 		os.system(f"echo {config_pass} | rclone copy {local+path_compressed} {r} -P")
 		print(GREEN+"[+] "+RESET_ALL+"Uploaded to "+r)

@@ -26,12 +26,11 @@
 
 ```toml
 [config]
-workingDirectory = "/path/to/working/directory"
+workingDirectory = "/path/to/working/directory" # Directory where compressed files and logs will be saved
 shutDownAfterBackup = false
 alwaysCompress = false
 remote = ["remote:folder", "remote2:"]
 local = "local:"
-configPass = "here your super secure passphrase for rclone config" 
 
 [exclude]
 directories = [".git", "node_modules"] # If none leave it empty 
@@ -39,13 +38,15 @@ directories = [".git", "node_modules"] # If none leave it empty
 [[pathAndDirName]]
 path = "/path/to/folder/to/backup"
 zipName = "NameOfTheZipFile
-
-[[pathAndDirName]]
-path = "/path/to/folder/to/backup2"
-zipName = "AnotherNameOfTheZipFile"
 ```
 
 You can add as many `[[pathAndDirName]]` as you want.
+
+- Export the `RCLONE_CONFIG_PASS` environment variable with the rclone configuration password. You also can add it to your `.bashrc` or `.zshrc` file.
+
+```bash
+export RCLONE_CONFIG_PASS="yourRcloneConfigPass"
+```
 
 ## Usage
 
