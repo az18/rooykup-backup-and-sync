@@ -1,105 +1,35 @@
 [config]
-# Optional: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-# Default: INFO
-logLevel = "INFO"
+# Global default settings
+logLevel = "INFO"                  # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+workingDirectory = "~/backup"      # Directory for compressed files and logs
+retentionDays = 7                  # Days to keep backups before auto-deletion
+shutDownAfterBackup = false        # Shutdown system after backup completion
+forceNewBackup = false            # Create versioned backups on same day (e.g. file_2024-02-18_v1.zip)
+preserveFullPath = true           # Maintain full directory structure in zip files
 
-# Optional: Directory where compressed files and logs will be saved
-# Default: ~/backup
-workingDirectory = "~/backup"
-
-# Optional: Whether to shut down the system after backup is complete
-# Default: false
-shutDownAfterBackup = false
-
-# Optional: How many days of backups to retain (global default)
-# - Files older than this will be automatically deleted
-# - Same-day backups will be versioned (e.g. file_2024-02-18_v1.zip)
-# Default: 7
-retentionDays = 7
-
-# Optional: Whether to force creating new backups even if one exists from today (global default)
-# When enabled, multiple backups on the same day will create versioned files
-# For example: Documents_2024-02-18_v1.zip, Documents_2024-02-18_v2.zip
-# Default: false
-forceNewBackup = false
-
-# Optional: Whether to maintain full directory structure in zip files (global default)
-# Default: true
-preserveFullPath = true
-
-# Optional: Remote backup destinations for rclone
-# Default: None (rclone sync will be skipped if not configured)
-remote = ["remote:folder", "remote2:"]
-
-# Optional: Local backup destination for rclone
-# Default: None (rclone sync will be skipped if not configured)
-local = "local:"
+# Remote backup configuration (rclone)
+remote = ["remote:folder", "remote2:"]  # Remote destinations
+local = "local:"                        # Local destination
 
 [exclude]
-# Optional: Directories to exclude from backup
-# Default: Empty list
+# Global exclusion patterns
 directories = [".git", "node_modules", "logs"]
 
+# Individual directory backup configurations
 [[pathAndDirName]]
-# Required: Source directory path to backup
-path = "/Users/user/Documents"
-# Optional: Name of the zip file to create (defaults to the directory name if not specified)
-zipName = "Documents"
-# Optional: Override global preserveFullPath setting for this directory
-preserveFullPath = true
-# Optional: Override global retentionDays setting for this directory
-# Keep Documents backups for 14 days instead of the global 7 days
-retentionDays = 14
-# Optional: Override global forceNewBackup setting for this directory
-# Always create new backups for Documents even if one exists from today
-forceNewBackup = true
-# Optional: Override global exclude directories for this specific backup
-# These will only apply to this Documents backup
-exclude = [".env", "tmp", "cache"]
+path = "/Users/user/Documents"      # Source directory
+zipName = "Documents"               # Optional, Output zip file name
+preserveFullPath = true             # Optional, Override global setting
+retentionDays = 14                  # Optional, Override global setting
+forceNewBackup = true               # Optional, Override global setting
+exclude = [".env", "tmp", "cache"]  # Optional, Override global setting
 
-[[pathAndDirName]]
-# Required: Source directory path to backup
-path = "/Users/user/Pictures"
-# Optional: Name of the zip file to create (defaults to the directory name if not specified)
-zipName = "Pictures"
-# Note: Uses global settings since no overrides specified
-
-[[pathAndDirName]]
-# Required: Source directory path to backup
-path = "/Users/user/Projects"
-# Optional: Name of the zip file to create (defaults to the directory name if not specified)
-zipName = "Projects"
-# Optional: Override global preserveFullPath setting for this directory
-preserveFullPath = false
-# Optional: Override global retentionDays setting for this directory
-# Keep Project backups for 30 days
-retentionDays = 30
-# Optional: Override global forceNewBackup setting for this directory
-# Don't create new backups if one exists from today
-forceNewBackup = false
-
-# Auto-backup configuration
-# This will automatically detect and backup all immediate subfolders
+# Auto-backup configurations
+# Automatically detects and backs up all immediate subfolders
 [[autoBackup]]
-# Required: Parent directory to scan for subfolders
 parentPath = "/Users/user/dockers"
-
-# Optional: Prefix for zip file names of auto-detected folders
-# For example, with zipNamePrefix = "docker_", a subfolder "app1" will be backed up as "docker_app1"
-zipNamePrefix = "docker_"
-
-# Optional: Override global settings for auto-detected folders
-# These settings will apply to all subfolders found in parentPath
-preserveFullPath = true    # Override global preserveFullPath setting
-retentionDays = 14        # Override global retentionDays setting
-forceNewBackup = false    # Override global forceNewBackup setting
-
-# Optional: Override global exclude directories for all auto-detected folders
-# These directories will be excluded from all Docker project backups
-exclude = ["node_modules", "dist", "logs"]
-
-# You can specify multiple parent directories to scan
-[[autoBackup]]
-parentPath = "/Users/user/projects"
-zipNamePrefix = "project_"    # Optional: Add prefix to all project backups
-# Uses global settings since no overrides specified
+zipNamePrefix = "docker_"                   # Prefix for auto-detected folder backups
+preserveFullPath = true                     # Optional, Override global setting
+retentionDays = 14                          # Optional, Override global setting
+forceNewBackup = false                      # Optional, Override global setting
+exclude = ["node_modules", "dist", "logs"]  # Optional, Override global setting
