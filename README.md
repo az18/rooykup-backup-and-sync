@@ -53,14 +53,18 @@ remote = ["remote:folder", "remote2:"]
 local = "local:"
 
 [exclude]
-directories = [".git", "node_modules"] # If none leave it empty 
+# Optional: Global directories to exclude from all backups
+# These will apply to all backups unless overridden
+directories = [".git", "node_modules"] # If none leave it empty
 
 [[pathAndDirName]]
+# Each backup configuration can override the global exclude list
 path = "/path/to/folder/to/backup"
 zipName = "NameOfTheZipFile"  # Optional: If not provided, folder name will be used
-forceNewBackup = true        # Optional: Override global forceNewBackup for this directory
-retentionDays = 14          # Optional: Override global retentionDays for this directory
-preserveFullPath = false     # Optional: Override global preserveFullPath for this directory
+forceNewBackup = true         # Optional: Override global forceNewBackup for this directory
+retentionDays = 14           # Optional: Override global retentionDays for this directory
+preserveFullPath = false      # Optional: Override global preserveFullPath for this directory
+exclude = [".env", "tmp"]     # Optional: Override global exclude directories for this backup
 ```
 
 You can add as many `[[pathAndDirName]]` sections as you want. For each section:
@@ -100,8 +104,9 @@ The `[[autoBackup]]` section allows you to automatically backup all subfolders w
 - `preserveFullPath`: (optional) Override global setting for all auto-detected folders
 - `retentionDays`: (optional) Override global setting for all auto-detected folders
 - `forceNewBackup`: (optional) Override global setting for all auto-detected folders
+- `exclude`: (optional) Override global exclude directories for all auto-detected folders
 
-You can have multiple `[[autoBackup]]` sections for different parent directories, each with its own settings and prefix. Global exclude rules from the `[exclude]` section apply to auto-detected folders as well.
+You can have multiple `[[autoBackup]]` sections for different parent directories, each with its own settings and prefix. Each section can override both global settings and exclude directories for its subfolders.
 
 Example: Auto-backup all Docker projects
 ```toml

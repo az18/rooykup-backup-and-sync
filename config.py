@@ -42,9 +42,16 @@ SHUTDOWN_AFTER = bool(toml_data['config'].get('shutDownAfterBackup', False))
 PRESERVE_FULL_PATH = bool(toml_data['config'].get('preserveFullPath', True))
 RETENTION_DAYS = int(toml_data['config'].get('retentionDays', 7))  # Ensure integer conversion
 
+# Get default exclude directories from config
+EXCLUDE_DIRS = toml_data.get('exclude', {}).get('directories', [])
+
 def get_preserve_full_path(directory_config):
     """Get preserveFullPath setting for a directory, falling back to global setting"""
     return directory_config.get('preserveFullPath', PRESERVE_FULL_PATH)
+
+def get_exclude_directories(directory_config):
+    """Get exclude directories for a directory, falling back to global setting"""
+    return directory_config.get('exclude', EXCLUDE_DIRS)
 
 def get_force_new_backup(directory_config):
     """Get forceNewBackup setting for a directory, falling back to global setting"""
@@ -92,7 +99,8 @@ if 'autoBackup' in toml_data:
                     # Copy any override settings from autoBackup
                     'preserveFullPath': auto_config.get('preserveFullPath', PRESERVE_FULL_PATH),
                     'retentionDays': auto_config.get('retentionDays', RETENTION_DAYS),
-                    'forceNewBackup': auto_config.get('forceNewBackup', ALLWAYS_CREATE_ZIP)
+                    'forceNewBackup': auto_config.get('forceNewBackup', ALLWAYS_CREATE_ZIP),
+                    'exclude': auto_config.get('exclude', EXCLUDE_DIRS)  # Include exclude directories override
                 }
                 toml_data['pathAndDirName'].append(entry)
                 existing_paths.add(folder)

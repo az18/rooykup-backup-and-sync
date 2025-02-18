@@ -38,7 +38,7 @@ local = "local:"
 [exclude]
 # Optional: Directories to exclude from backup
 # Default: Empty list
-directories = [".git", "node_modules"]
+directories = [".git", "node_modules", "logs"]
 
 [[pathAndDirName]]
 # Required: Source directory path to backup
@@ -53,6 +53,9 @@ retentionDays = 14
 # Optional: Override global forceNewBackup setting for this directory
 # Always create new backups for Documents even if one exists from today
 forceNewBackup = true
+# Optional: Override global exclude directories for this specific backup
+# These will only apply to this Documents backup
+exclude = [".env", "tmp", "cache"]
 
 [[pathAndDirName]]
 # Required: Source directory path to backup
@@ -90,6 +93,10 @@ zipNamePrefix = "docker_"
 preserveFullPath = true    # Override global preserveFullPath setting
 retentionDays = 14        # Override global retentionDays setting
 forceNewBackup = false    # Override global forceNewBackup setting
+
+# Optional: Override global exclude directories for all auto-detected folders
+# These directories will be excluded from all Docker project backups
+exclude = ["node_modules", "dist", "logs"]
 
 # You can specify multiple parent directories to scan
 [[autoBackup]]
