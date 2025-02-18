@@ -39,7 +39,7 @@ pip install -r requirements.txt
 
 ### rooykup
 
-1. Create a `config.toml` file at `~/rooykup/config.toml`
+1. Create a `config.toml` file at `~/rooykup/config.toml`. You can use the provided `config.example.toml` as a template, which includes detailed descriptions of all available options and their default values.
 
 Configuration structure:
 ```toml

@@ -1,0 +1,52 @@
+[config]
+# Optional: Directory where compressed files and logs will be saved
+# Default: ~/backup
+workingDirectory = "~/backup"
+
+# Optional: Whether to shut down the system after backup is complete
+# Default: false
+shutDownAfterBackup = false
+
+# Optional: Whether to always compress files during backup
+# Default: false
+alwaysCompress = true
+
+# Optional: Whether to maintain full directory structure in zip files (global default)
+# Default: true
+preserveFullPath = true
+
+# Optional: Remote backup destinations for rclone
+# Default: None (rclone sync will be skipped if not configured)
+remote = ["remote:folder", "remote2:"]
+
+# Optional: Local backup destination for rclone
+# Default: None (rclone sync will be skipped if not configured)
+local = "local:"
+
+[exclude]
+# Optional: Directories to exclude from backup
+# Default: Empty list
+directories = [".git", "node_modules"]
+
+[[pathAndDirName]]
+# Required: Source directory path to backup
+path = "/Users/user/Documents"
+# Optional: Name of the zip file to create (defaults to the directory name if not specified)
+zipName = "Documents"
+# Optional: Override global preserveFullPath setting for this directory
+preserveFullPath = true
+
+[[pathAndDirName]]
+# Required: Source directory path to backup
+path = "/Users/user/Pictures"
+# Optional: Name of the zip file to create (defaults to the directory name if not specified)
+zipName = "Pictures"
+# Note: Uses global preserveFullPath setting (true) since not specified
+
+[[pathAndDirName]]
+# Required: Source directory path to backup
+path = "/Users/user/Projects"
+# Optional: Name of the zip file to create (defaults to the directory name if not specified)
+zipName = "Projects"
+# Optional: Override global preserveFullPath setting for this directory
+preserveFullPath = false
