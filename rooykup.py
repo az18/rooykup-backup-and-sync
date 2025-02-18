@@ -19,8 +19,9 @@ def get_backup_version(base_name, date_str):
     versions = [int(re.search(pattern, f).group(1)) for f in existing if re.search(pattern, f)]
     return max(versions, default=0) + 1
 
-def cleanup_old_backups(retention_days):
-    """Remove backup files older than retention_days"""
+def cleanup_old_backups(directory_config):
+    """Remove backup files older than retention_days specified in config"""
+    retention_days = get_retention_days(directory_config)
     cutoff = today - datetime.timedelta(days=retention_days)
     pattern = re.compile(r".*_(\d{4}-\d{2}-\d{2})_v\d+\.zip$")
     
@@ -63,7 +64,6 @@ parser.set_defaults(shutdown=SHUTDOWN_AFTER, always_create_zip=ALLWAYS_CREATE_ZI
 args = parser.parse_args()
 
 # Override settings from command line arguments if provided
-ALLWAYS_CREATE_ZIP = args.always_create_zip or ALLWAYS_CREATE_ZIP
 SHUTDOWN_AFTER = args.shutdown or SHUTDOWN_AFTER
 
 # Start timer
@@ -87,15 +87,18 @@ for p in toml_data['pathAndDirName']:
             f.write(string_to_log+"\n")
         continue
 
-    # Clean up old backups first
-    cleanup_old_backups(RETENTION_DAYS)
+    # Get directory-specific settings
+    force_new_backup = args.always_create_zip or get_force_new_backup(p)
+
+    # Clean up old backups first (using directory-specific retention)
+    cleanup_old_backups(p)
 
     # Size of directory
     size_initial_mb = size_initial/(1024*1024)
     date_str = today.strftime("%Y-%m-%d")
     
     # Debug info
-    print(BLUE+"[-] Debug: forceNewBackup setting =", ALLWAYS_CREATE_ZIP, RESET_ALL)
+    print(BLUE+"[-] Debug: forceNewBackup setting =", force_new_backup, RESET_ALL)
     
     # Check existing backups from today
     pattern = f"{zip_name_base}_{date_str}_v*.zip"
@@ -108,7 +111,7 @@ for p in toml_data['pathAndDirName']:
         latest_version = get_backup_version(zip_name_base, date_str) - 1
         print(BLUE+f"[-] Debug: Latest version found: {latest_version}", RESET_ALL)
         
-        if not ALLWAYS_CREATE_ZIP:
+        if not force_new_backup:
             print(f"- [x] {zip_name_base}_{date_str}_v{latest_version}.zip "+GREEN+"(Already created today)"+RESET_ALL)
             continue
         print(BLUE+"[-] Debug: forceNewBackup=true, creating new version", RESET_ALL)

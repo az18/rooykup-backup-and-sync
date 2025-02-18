@@ -46,6 +46,14 @@ def get_preserve_full_path(directory_config):
     """Get preserveFullPath setting for a directory, falling back to global setting"""
     return directory_config.get('preserveFullPath', PRESERVE_FULL_PATH)
 
+def get_force_new_backup(directory_config):
+    """Get forceNewBackup setting for a directory, falling back to global setting"""
+    return directory_config.get('forceNewBackup', ALLWAYS_CREATE_ZIP)
+
+def get_retention_days(directory_config):
+    """Get retentionDays setting for a directory, falling back to global setting"""
+    return directory_config.get('retentionDays', RETENTION_DAYS)
+
 # Creating folders if necessary
 for directory in ['compressed', 'logs']:
     if not os.path.exists(directory):

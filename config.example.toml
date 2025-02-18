@@ -7,17 +7,17 @@ workingDirectory = "~/backup"
 # Default: false
 shutDownAfterBackup = false
 
-# Optional: How many days of backups to retain
+# Optional: How many days of backups to retain (global default)
 # - Files older than this will be automatically deleted
 # - Same-day backups will be versioned (e.g. file_2024-02-18_v1.zip)
 # Default: 7
 retentionDays = 7
 
-# Optional: Whether to force creating new backups even if one exists from today
+# Optional: Whether to force creating new backups even if one exists from today (global default)
 # When enabled, multiple backups on the same day will create versioned files
 # For example: Documents_2024-02-18_v1.zip, Documents_2024-02-18_v2.zip
 # Default: false
-forceNewBackup = true
+forceNewBackup = false
 
 # Optional: Whether to maintain full directory structure in zip files (global default)
 # Default: true
@@ -43,13 +43,19 @@ path = "/Users/user/Documents"
 zipName = "Documents"
 # Optional: Override global preserveFullPath setting for this directory
 preserveFullPath = true
+# Optional: Override global retentionDays setting for this directory
+# Keep Documents backups for 14 days instead of the global 7 days
+retentionDays = 14
+# Optional: Override global forceNewBackup setting for this directory
+# Always create new backups for Documents even if one exists from today
+forceNewBackup = true
 
 [[pathAndDirName]]
 # Required: Source directory path to backup
 path = "/Users/user/Pictures"
 # Optional: Name of the zip file to create (defaults to the directory name if not specified)
 zipName = "Pictures"
-# Note: Uses global preserveFullPath setting (true) since not specified
+# Note: Uses global settings since no overrides specified
 
 [[pathAndDirName]]
 # Required: Source directory path to backup
@@ -58,3 +64,9 @@ path = "/Users/user/Projects"
 zipName = "Projects"
 # Optional: Override global preserveFullPath setting for this directory
 preserveFullPath = false
+# Optional: Override global retentionDays setting for this directory
+# Keep Project backups for 30 days
+retentionDays = 30
+# Optional: Override global forceNewBackup setting for this directory
+# Don't create new backups if one exists from today
+forceNewBackup = false

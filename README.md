@@ -46,8 +46,9 @@ Configuration structure:
 [config]
 workingDirectory = "/path/to/working/directory" # Optional: Directory where compressed files and logs will be saved
 shutDownAfterBackup = false
-forceNewBackup = false  # Whether to create new backups even if one exists from today
-preserveFullPath = true # Optional: Whether to maintain full directory structure in zip files
+forceNewBackup = false  # Global default: Whether to create new backups even if one exists from today
+preserveFullPath = true # Global default: Whether to maintain full directory structure in zip files
+retentionDays = 7      # Global default: Number of days to keep backup files
 remote = ["remote:folder", "remote2:"]
 local = "local:"
 
@@ -57,22 +58,32 @@ directories = [".git", "node_modules"] # If none leave it empty
 [[pathAndDirName]]
 path = "/path/to/folder/to/backup"
 zipName = "NameOfTheZipFile"  # Optional: If not provided, folder name will be used
+forceNewBackup = true        # Optional: Override global forceNewBackup for this directory
+retentionDays = 14          # Optional: Override global retentionDays for this directory
+preserveFullPath = false     # Optional: Override global preserveFullPath for this directory
 ```
 
 You can add as many `[[pathAndDirName]]` sections as you want. For each section:
 - `path`: (required) Full path to the directory you want to back up
 - `zipName`: (optional) Name for the zip file. If not provided, the folder name from the path will be used
+- `forceNewBackup`: (optional) Override global setting for force creating new backups
+- `retentionDays`: (optional) Override global setting for backup retention period
+- `preserveFullPath`: (optional) Override global setting for preserving full path structure
 
 Example:
 ```toml
-# With explicit zipName (creates "documents.zip")
+# With explicit settings
 [[pathAndDirName]]
 path = "/home/user/documents"
 zipName = "documents"
+forceNewBackup = true   # Always create new backups for documents
+retentionDays = 14     # Keep documents backups for 14 days
+preserveFullPath = true
 
-# Without zipName (automatically creates "documents.zip")
+# Using global defaults
 [[pathAndDirName]]
-path = "/home/user/documents"
+path = "/home/user/pictures"
+zipName = "pictures"    # Uses global settings for forceNewBackup, retentionDays, and preserveFullPath
 ```
 
 2. Set the environment variable for rclone configuration:
@@ -107,15 +118,23 @@ alias rooykup="python /path/to/rooykup.py"
 
 ### Configuration Options
 - `retentionDays`: Number of days to keep backup files (default: 7). Older backups are automatically deleted. Set this according to how long you want to retain your backup history.
+  * Can be set globally in the `[config]` section
+  * Can be overridden per directory in each `[[pathAndDirName]]` section
+  * Example: Keep documents for 14 days but pictures for only 7 days
 
 - `forceNewBackup`: Controls how multiple backups on the same day are handled:
   * When false (default): Skip if a backup already exists from today
   * When true: Create a new versioned backup (e.g., `Documents_2024-02-18_v1.zip`, `Documents_2024-02-18_v2.zip`)
   * Can be overridden with `-c` command line option
+  * Can be set globally in the `[config]` section
+  * Can be overridden per directory in each `[[pathAndDirName]]` section
+  * Example: Always create new backups for documents but skip duplicates for pictures
 
 - `shutDownAfterBackup`: Enable automatic shutdown after backup (can be overridden with `-s`)
 - `workingDirectory`: Custom backup location (defaults to `~/backup` if not set)
 - `preserveFullPath`: When set to true (default), maintains the full directory structure in the zip file. When false, only includes the target directory and its contents.
+  * Can be set globally in the `[config]` section
+  * Can be overridden per directory in each `[[pathAndDirName]]` section
 
 ### Backup File Naming
 Backups are now created with a versioned naming scheme:
