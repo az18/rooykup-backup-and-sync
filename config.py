@@ -1,45 +1,46 @@
-import os, toml
+import os
+import platform
+import toml
 from colors import *
 
 HOME = os.getenv('HOME')
 
-if not os.path.exists(HOME+'/.config/rooykup'):
-	os.makedirs(HOME+'/.config/rooykup')
+# Use ~/rooykup for all platforms
+CONFIG_DIR = os.path.join(HOME, 'rooykup')
+CONFIG_FILE = os.path.join(CONFIG_DIR, 'config.toml')
+
+# Use ~/backup for all platforms
+DEFAULT_BACKUP_DIR = os.path.join(HOME, 'backup')
+
+# Create necessary directories
+if not os.path.exists(CONFIG_DIR):
+    os.makedirs(CONFIG_DIR)
 
 # Import config file
 try:
-	with open(HOME+'/.config/rooykup/config.toml', 'r') as file:
-	    toml_data = toml.load(file)
-	if len(toml_data) == 0:
-		raise Exception("Config file is empty")
+    with open(CONFIG_FILE, 'r') as file:
+        toml_data = toml.load(file)
+    if len(toml_data) == 0:
+        raise Exception("Config file is empty")
 except Exception as e:
-	print(RED+" ==> "+RESET_ALL+str(e))
-	exit()
+    print(RED + " ==> " + RESET_ALL + str(e))
+    exit()
 
 # Setting working directory
-if toml_data['config']['workingDirectory']:
-	working_directory = toml_data['config']['workingDirectory']
+if toml_data['config'].get('workingDirectory'):
+    working_directory = toml_data['config']['workingDirectory']
 else:
-	if not os.path.exists(HOME+"/backup"):
-		os.makedirs(HOME+"/backup")
-	working_directory = HOME+"/backup"
+    if not os.path.exists(DEFAULT_BACKUP_DIR):
+        os.makedirs(DEFAULT_BACKUP_DIR)
+    working_directory = DEFAULT_BACKUP_DIR
 
 os.chdir(working_directory)
 
 # Setting variables
-if toml_data['config']['alwaysCompress']:
-	ALLWAYS_CREATE_ZIP = toml_data['config']['alwaysCompress']
-else:
-	ALLWAYS_CREATE_ZIP = False
-
-if toml_data['config']['shutDownAfterBackup']:
-	SHUTDOWN_AFTER = toml_data['config']['shutDownAfterBackup']
-else:
-	SHUTDOWN_AFTER = False
+ALLWAYS_CREATE_ZIP = toml_data['config'].get('alwaysCompress', False)
+SHUTDOWN_AFTER = toml_data['config'].get('shutDownAfterBackup', False)
 
 # Creating folders if necessary
-if not os.path.exists("compressed"):
-	os.makedirs("compressed")
-
-if not os.path.exists("logs"):
-	os.makedirs("logs")
+for directory in ['compressed', 'logs']:
+    if not os.path.exists(directory):
+        os.makedirs(directory)

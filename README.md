@@ -1,4 +1,4 @@
-# rooykup - Backup and sync tool
+# rooykup - Cross-platform Backup and Sync Tool
 
 ![EXAMPLE](rooykup_example.gif)
 
@@ -6,27 +6,45 @@
 
 ## Table of Contents
 
+- [Platform Support](#platform-support)
+- [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
 
+## Platform Support
+
+rooykup is compatible with both Linux and macOS systems. All directories are consistent across platforms:
+
+### Directory Structure (All Platforms)
+- Configuration directory: `~/rooykup/`
+- Default backup directory: `~/backup`
+
+## Installation
+
+1. Clone this repository
+2. Install the required Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
 ## Configuration
 
 ### rclone
 
-- Download rclone from https://rclone.org/downloads/
-- Configure rclone with `rclone config`. Follow the instructions from https://rclone.org/docs/
-- Set a strong configuration password and save it in a `confg` file in `~/.config/rooykup`
+1. Download rclone from https://rclone.org/downloads/
+2. Configure rclone with `rclone config`. Follow the instructions from https://rclone.org/docs/
+3. Set a strong configuration password
 
 ### rooykup
 
-- Clone this repository
-- Create a `config.toml` file in `~/.config/rooykup` with the following structure:
+1. Create a `config.toml` file at `~/rooykup/config.toml`
 
+Configuration structure:
 ```toml
 [config]
-workingDirectory = "/path/to/working/directory" # Directory where compressed files and logs will be saved
+workingDirectory = "/path/to/working/directory" # Optional: Directory where compressed files and logs will be saved
 shutDownAfterBackup = false
 alwaysCompress = false
 remote = ["remote:folder", "remote2:"]
@@ -37,47 +55,62 @@ directories = [".git", "node_modules"] # If none leave it empty
 
 [[pathAndDirName]]
 path = "/path/to/folder/to/backup"
-zipName = "NameOfTheZipFile
+zipName = "NameOfTheZipFile"
 ```
 
-You can add as many `[[pathAndDirName]]` as you want.
+You can add as many `[[pathAndDirName]]` sections as you want.
 
-- Export the `RCLONE_CONFIG_PASS` environment variable with the rclone configuration password. You also can add it to your `.bashrc` or `.zshrc` file.
-
-```bash
-export RCLONE_CONFIG_PASS="yourRcloneConfigPass"
-```
+2. Set the environment variable for rclone configuration:
+   - For Bash/Zsh, add to your `.bashrc` or `.zshrc`:
+     ```bash
+     export RCLONE_CONFIG_PASS="yourRcloneConfigPass"
+     ```
+   - For macOS, you can also add it to `~/.profile`
 
 ## Usage
 
-- Run `python rooykup.py` (`./rooykup` if you download it from [release page](https://github.com/Rooyca/rooykup-backup-and-sync/releases)) to start the backup process
-- If you want to run it periodically, you can use `cron` or `systemd`
+### Basic Usage
+Run the script:
+```bash
+python rooykup.py
+```
+Or use the executable from the [release page](https://github.com/Rooyca/rooykup-backup-and-sync/releases)
 
-You can also create an alias in your `.bashrc` file or `.zshrc` file
+### Command Line Options
+- `-s` or `--shutdown`: Shutdown the system after backup completion
+- `-c` or `--always-create-zip`: Create zip even if today's backup exists
 
+### Setting Up Aliases
+Add to your `.bashrc`, `.zshrc`, or `~/.profile`:
 ```bash
 alias rooykup="python /path/to/rooykup.py"
 ```
 
-If you want to shut down your computer after the backup process, set `shutDownAfterBackup` to `true` in your `config.toml` file or run it with the `-s` flag.
+### Automated Backups
+- Linux: Use `cron` or `systemd`
+- macOS: Use `launchd` or set up in System Preferences > Battery > Schedule
 
-If you want to always compress the files, set `alwaysCompress` to `true` in your `config.toml` file or run it with the `-c` flag. This will compress even if the directory already has a compressed file from today.
+### Configuration Options
+- `shutDownAfterBackup`: Enable automatic shutdown after backup (can be overridden with `-s`)
+- `alwaysCompress`: Always create new archives (can be overridden with `-c`)
+- `workingDirectory`: Custom backup location (defaults to `~/backup` if not set)
 
-### Polybar module
+### Desktop Integration
 
-If you want to use the polybar module, add the following to your polybar config file:
-
+#### Linux (Polybar module)
+Add to your polybar config:
 ```ini
 [module/bs]
 type = custom/script
 exec = echo " "
-format-prefix = "  "
+format-prefix = "  "
 format-prefix-foreground = #000
 format-background = #fb4934
 click-left = alacritty --hold -e python /path/to/rooykup.py -s
 ```
 
-Here I'm using `alacritty` as my terminal emulator, but you can change it to whatever you want.
+#### macOS
+You can create an Automator quick action or use the built-in Calendar app to schedule backups.
 
 ## Contributing
 
