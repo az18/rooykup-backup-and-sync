@@ -79,7 +79,12 @@ for p in toml_data['pathAndDirName']:
         for file in files:
             try:
                 file_path = os.path.join(root, file)
-                archive.write(file_path)
+                if PRESERVE_FULL_PATH:
+                    archive.write(file_path)  # Keep full path structure
+                else:
+                    # Remove the source_dir part from the path to only include target directory
+                    rel_path = os.path.relpath(file_path, os.path.dirname(source_dir))
+                    archive.write(file_path, rel_path)
             except Exception as e:
                 print(RED+"[-] Error: "+RESET_ALL+f" Something went wrong with: {file} at {root} ({str(e)}) (Skipping)")
                 continue

@@ -39,6 +39,7 @@ os.chdir(working_directory)
 # Setting variables
 ALLWAYS_CREATE_ZIP = toml_data['config'].get('alwaysCompress', False)
 SHUTDOWN_AFTER = toml_data['config'].get('shutDownAfterBackup', False)
+PRESERVE_FULL_PATH = toml_data['config'].get('preserveFullPath', True)
 
 # Creating folders if necessary
 for directory in ['compressed', 'logs']:

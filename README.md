@@ -47,6 +47,7 @@ Configuration structure:
 workingDirectory = "/path/to/working/directory" # Optional: Directory where compressed files and logs will be saved
 shutDownAfterBackup = false
 alwaysCompress = false
+preserveFullPath = true # Optional: Whether to maintain full directory structure in zip files
 remote = ["remote:folder", "remote2:"]
 local = "local:"
 
@@ -94,6 +95,11 @@ alias rooykup="python /path/to/rooykup.py"
 - `shutDownAfterBackup`: Enable automatic shutdown after backup (can be overridden with `-s`)
 - `alwaysCompress`: Always create new archives (can be overridden with `-c`)
 - `workingDirectory`: Custom backup location (defaults to `~/backup` if not set)
+- `preserveFullPath`: When set to true (default), maintains the full directory structure in the zip file. When false, only includes the target directory and its contents.
+
+For example, with a backup path of `/home/user/documents/projects`:
+- If `preserveFullPath = true`: The zip will contain the full path structure
+- If `preserveFullPath = false`: The zip will only contain the "projects" directory structure
 
 ### Desktop Integration
 
