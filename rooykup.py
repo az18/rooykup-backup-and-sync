@@ -33,7 +33,7 @@ def check_if_file_was_created_today(file_path):
 # Parsing arguments
 parser = argparse.ArgumentParser(description='rooykup lets you backup and sync your data')
 parser.add_argument('-s', '--shutdown', dest='shutdown', action='store_true', help='Shutdown after script is done')
-parser.add_argument('-c', '--always-create-zip', dest='always_create_zip', action='store_true', help='Create zip even if it already exists')
+parser.add_argument('-c', '--force-new-backup', dest='always_create_zip', action='store_true', help='Force creating a new backup even if one exists from today')
 parser.set_defaults(shutdown=SHUTDOWN_AFTER, always_create_zip=ALLWAYS_CREATE_ZIP)
 args = parser.parse_args()
 

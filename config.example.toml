@@ -7,9 +7,12 @@ workingDirectory = "~/backup"
 # Default: false
 shutDownAfterBackup = false
 
-# Optional: Whether to always compress files during backup
+# Optional: Whether to force creating new backups even if one exists from today
+# This is useful when you need multiple backups per day, for example:
+# - When working on critical files that change frequently
+# - When you want to ensure you have different versions throughout the day
 # Default: false
-alwaysCompress = true
+forceNewBackup = true
 
 # Optional: Whether to maintain full directory structure in zip files (global default)
 # Default: true

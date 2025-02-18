@@ -46,7 +46,7 @@ Configuration structure:
 [config]
 workingDirectory = "/path/to/working/directory" # Optional: Directory where compressed files and logs will be saved
 shutDownAfterBackup = false
-alwaysCompress = false
+forceNewBackup = false  # Whether to create new backups even if one exists from today
 preserveFullPath = true # Optional: Whether to maintain full directory structure in zip files
 remote = ["remote:folder", "remote2:"]
 local = "local:"
@@ -93,7 +93,7 @@ Or use the executable from the [release page](https://github.com/Rooyca/rooykup-
 
 ### Command Line Options
 - `-s` or `--shutdown`: Shutdown the system after backup completion
-- `-c` or `--always-create-zip`: Create zip even if today's backup exists
+- `-c` or `--force-new-backup`: Force creating a new backup even if one exists from today
 
 ### Setting Up Aliases
 Add to your `.bashrc`, `.zshrc`, or `~/.profile`:
@@ -107,7 +107,7 @@ alias rooykup="python /path/to/rooykup.py"
 
 ### Configuration Options
 - `shutDownAfterBackup`: Enable automatic shutdown after backup (can be overridden with `-s`)
-- `alwaysCompress`: Always create new archives (can be overridden with `-c`)
+- `forceNewBackup`: Force creating new backups even if one exists from today. Useful for files that change frequently throughout the day or when you need multiple backup versions. Can be overridden with `-c`.
 - `workingDirectory`: Custom backup location (defaults to `~/backup` if not set)
 - `preserveFullPath`: When set to true (default), maintains the full directory structure in the zip file. When false, only includes the target directory and its contents.
 
