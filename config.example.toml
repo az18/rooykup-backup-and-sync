@@ -1,0 +1,35 @@
+[config]
+# Global default settings
+logLevel = "INFO"                  # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+workingDirectory = "~/backup"      # Directory for compressed files and logs
+retentionDays = 7                  # Days to keep backups before auto-deletion
+shutDownAfterBackup = false        # Shutdown system after backup completion
+forceNewBackup = false            # Create versioned backups on same day (e.g. file_2024-02-18_v1.zip)
+preserveFullPath = true           # Maintain full directory structure in zip files
+
+# Remote backup configuration (rclone)
+remote = ["remote:folder", "remote2:"]  # Remote destinations
+local = "local:"                        # Local destination
+
+[exclude]
+# Global exclusion patterns
+directories = [".git", "node_modules", "logs"]
+
+# Individual directory backup configurations
+[[pathAndDirName]]
+path = "/Users/user/Documents"      # Source directory
+zipName = "Documents"               # Optional, Output zip file name
+preserveFullPath = true             # Optional, Override global setting
+retentionDays = 14                  # Optional, Override global setting
+forceNewBackup = true               # Optional, Override global setting
+exclude = [".env", "tmp", "cache"]  # Optional, Override global setting
+
+# Auto-backup configurations
+# Automatically detects and backs up all immediate subfolders
+[[autoBackup]]
+parentPath = "/Users/user/dockers"
+zipNamePrefix = "docker_"                   # Prefix for auto-detected folder backups
+preserveFullPath = true                     # Optional, Override global setting
+retentionDays = 14                          # Optional, Override global setting
+forceNewBackup = false                      # Optional, Override global setting
+exclude = ["node_modules", "dist", "logs"]  # Optional, Override global setting

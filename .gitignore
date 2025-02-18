@@ -10,3 +10,4 @@ test/
 config.toml
 *.bin
 *build/
+.DS_Store
