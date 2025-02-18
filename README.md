@@ -106,10 +106,23 @@ alias rooykup="python /path/to/rooykup.py"
 - macOS: Use `launchd` or set up in System Preferences > Battery > Schedule
 
 ### Configuration Options
+- `retentionDays`: Number of days to keep backup files (default: 7). Older backups are automatically deleted. Set this according to how long you want to retain your backup history.
+
+- `forceNewBackup`: Controls how multiple backups on the same day are handled:
+  * When false (default): Skip if a backup already exists from today
+  * When true: Create a new versioned backup (e.g., `Documents_2024-02-18_v1.zip`, `Documents_2024-02-18_v2.zip`)
+  * Can be overridden with `-c` command line option
+
 - `shutDownAfterBackup`: Enable automatic shutdown after backup (can be overridden with `-s`)
-- `forceNewBackup`: Force creating new backups even if one exists from today. Useful for files that change frequently throughout the day or when you need multiple backup versions. Can be overridden with `-c`.
 - `workingDirectory`: Custom backup location (defaults to `~/backup` if not set)
 - `preserveFullPath`: When set to true (default), maintains the full directory structure in the zip file. When false, only includes the target directory and its contents.
+
+### Backup File Naming
+Backups are now created with a versioned naming scheme:
+- Format: `{name}_{date}_v{version}.zip`
+- Example: `Documents_2024-02-18_v1.zip`
+
+The version number automatically increments for multiple backups on the same day.
 
 For example, with a backup path of `/home/user/documents/projects`:
 - If `preserveFullPath = true`: The zip will contain the full path structure

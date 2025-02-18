@@ -7,10 +7,15 @@ workingDirectory = "~/backup"
 # Default: false
 shutDownAfterBackup = false
 
+# Optional: How many days of backups to retain
+# - Files older than this will be automatically deleted
+# - Same-day backups will be versioned (e.g. file_2024-02-18_v1.zip)
+# Default: 7
+retentionDays = 7
+
 # Optional: Whether to force creating new backups even if one exists from today
-# This is useful when you need multiple backups per day, for example:
-# - When working on critical files that change frequently
-# - When you want to ensure you have different versions throughout the day
+# When enabled, multiple backups on the same day will create versioned files
+# For example: Documents_2024-02-18_v1.zip, Documents_2024-02-18_v2.zip
 # Default: false
 forceNewBackup = true
 

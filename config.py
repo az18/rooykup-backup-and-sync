@@ -37,9 +37,10 @@ else:
 os.chdir(working_directory)
 
 # Setting variables
-ALLWAYS_CREATE_ZIP = toml_data['config'].get('forceNewBackup', False)
-SHUTDOWN_AFTER = toml_data['config'].get('shutDownAfterBackup', False)
-PRESERVE_FULL_PATH = toml_data['config'].get('preserveFullPath', True)
+ALLWAYS_CREATE_ZIP = bool(toml_data['config'].get('forceNewBackup', False))  # Ensure boolean conversion
+SHUTDOWN_AFTER = bool(toml_data['config'].get('shutDownAfterBackup', False))
+PRESERVE_FULL_PATH = bool(toml_data['config'].get('preserveFullPath', True))
+RETENTION_DAYS = int(toml_data['config'].get('retentionDays', 7))  # Ensure integer conversion
 
 def get_preserve_full_path(directory_config):
     """Get preserveFullPath setting for a directory, falling back to global setting"""

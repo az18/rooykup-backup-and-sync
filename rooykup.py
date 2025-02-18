@@ -5,10 +5,35 @@ import argparse
 import datetime
 import time
 import platform
+import glob
+import re
 from colors import *
 from config import *
 
 today = datetime.date.today()
+
+def get_backup_version(base_name, date_str):
+    """Get the next version number for a backup on the given date"""
+    pattern = f"{base_name}_{date_str}_v(\\d+).zip"
+    existing = glob.glob(os.path.join("compressed", f"{base_name}_{date_str}_v*.zip"))
+    versions = [int(re.search(pattern, f).group(1)) for f in existing if re.search(pattern, f)]
+    return max(versions, default=0) + 1
+
+def cleanup_old_backups(retention_days):
+    """Remove backup files older than retention_days"""
+    cutoff = today - datetime.timedelta(days=retention_days)
+    pattern = re.compile(r".*_(\d{4}-\d{2}-\d{2})_v\d+\.zip$")
+    
+    for file in glob.glob(os.path.join("compressed", "*.zip")):
+        match = pattern.match(file)
+        if match:
+            backup_date = datetime.datetime.strptime(match.group(1), "%Y-%m-%d").date()
+            if backup_date < cutoff:
+                try:
+                    os.remove(file)
+                    print(BLUE + "[-] Removed old backup: " + RESET_ALL + os.path.basename(file))
+                except Exception as e:
+                    print(RED + "[-] Error removing old backup: " + RESET_ALL + str(e))
 
 def system_shutdown():
     """Cross-platform system shutdown command"""
@@ -37,11 +62,9 @@ parser.add_argument('-c', '--force-new-backup', dest='always_create_zip', action
 parser.set_defaults(shutdown=SHUTDOWN_AFTER, always_create_zip=ALLWAYS_CREATE_ZIP)
 args = parser.parse_args()
 
-if args.always_create_zip:
-    ALLWAYS_CREATE_ZIP = not ALLWAYS_CREATE_ZIP
-
-if args.shutdown:
-    SHUTDOWN_AFTER = not SHUTDOWN_AFTER
+# Override settings from command line arguments if provided
+ALLWAYS_CREATE_ZIP = args.always_create_zip or ALLWAYS_CREATE_ZIP
+SHUTDOWN_AFTER = args.shutdown or SHUTDOWN_AFTER
 
 # Start timer
 started = time.time()
@@ -64,17 +87,38 @@ for p in toml_data['pathAndDirName']:
             f.write(string_to_log+"\n")
         continue
 
+    # Clean up old backups first
+    cleanup_old_backups(RETENTION_DAYS)
+
     # Size of directory
     size_initial_mb = size_initial/(1024*1024)
-    zip_name = zip_name_base+".zip"
+    date_str = today.strftime("%Y-%m-%d")
+    
+    # Debug info
+    print(BLUE+"[-] Debug: forceNewBackup setting =", ALLWAYS_CREATE_ZIP, RESET_ALL)
+    
+    # Check existing backups from today
+    pattern = f"{zip_name_base}_{date_str}_v*.zip"
+    existing_backups = glob.glob(os.path.join("compressed", pattern))
+    
+    print(BLUE+f"[-] Debug: Searching for: {pattern}", RESET_ALL)
+    print(BLUE+f"[-] Debug: Found backups: {[os.path.basename(f) for f in existing_backups]}", RESET_ALL)
+    
+    if existing_backups:
+        latest_version = get_backup_version(zip_name_base, date_str) - 1
+        print(BLUE+f"[-] Debug: Latest version found: {latest_version}", RESET_ALL)
+        
+        if not ALLWAYS_CREATE_ZIP:
+            print(f"- [x] {zip_name_base}_{date_str}_v{latest_version}.zip "+GREEN+"(Already created today)"+RESET_ALL)
+            continue
+        print(BLUE+"[-] Debug: forceNewBackup=true, creating new version", RESET_ALL)
+    
+    # Create new versioned backup
+    version = get_backup_version(zip_name_base, date_str)
+    print(BLUE+f"[-] Creating version {version} for today"+RESET_ALL)
+    zip_name = f"{zip_name_base}_{date_str}_v{version}.zip"
     zip_path = os.path.join("compressed", zip_name)
-
-    if not ALLWAYS_CREATE_ZIP:
-        if os.path.isfile(zip_path):
-            if check_if_file_was_created_today(zip_path):
-                print(f"- [x] {zip_name} "+GREEN+"(Already created today)"+RESET_ALL)
-                continue
-
+    
     archive = zipfile.ZipFile(zip_path, "w")
 
     for root, dirs, files in os.walk(source_dir):
@@ -95,7 +139,8 @@ for p in toml_data['pathAndDirName']:
 
     # Size of ZIP
     size_final = os.path.getsize(zip_path)/(1024*1024)
-    out_str = f"- [x] {zip_name} ({size_initial_mb:.1f}MB => {size_final:.1f}MB)"
+    reduction = (size_initial_mb - size_final) / size_initial_mb * 100 if size_initial_mb > 0 else 0
+    out_str = f"- [x] {zip_name} ({size_initial_mb:.1f}MB => {size_final:.1f}MB, {reduction:.1f}% reduction)"
 
     print(out_str[:out_str.find("(")]+GREEN+out_str[out_str.find("("):]+RESET_ALL)
 
