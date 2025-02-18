@@ -52,9 +52,13 @@ exclude = toml_data['exclude']['directories']
 for p in toml_data['pathAndDirName']:
     size_initial = get_size(p['path'])
 
+    # Get zip name - use folder name if zipName not provided
+    source_dir = p['path']
+    zip_name_base = p.get('zipName', os.path.basename(source_dir.rstrip('/')))
+    
     # Check if directory is empty or not found
     if size_initial == 0:
-        string_to_log = f"- [ ] {p['zipName']} (0MB) - Directory empty or not found"
+        string_to_log = f"- [ ] {zip_name_base} (0MB) - Directory empty or not found"
         print(string_to_log[:string_to_log.find("-")]+RED+string_to_log[string_to_log.find("-"):]+RESET_ALL)
         with open(os.path.join("logs", f"log-{str(today)}.md"), 'a') as f:
             f.write(string_to_log+"\n")
@@ -62,8 +66,7 @@ for p in toml_data['pathAndDirName']:
 
     # Size of directory
     size_initial_mb = size_initial/(1024*1024)
-    source_dir = p['path']
-    zip_name = p['zipName']+".zip"
+    zip_name = zip_name_base+".zip"
     zip_path = os.path.join("compressed", zip_name)
 
     if not ALLWAYS_CREATE_ZIP:

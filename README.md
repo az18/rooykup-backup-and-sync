@@ -56,10 +56,24 @@ directories = [".git", "node_modules"] # If none leave it empty
 
 [[pathAndDirName]]
 path = "/path/to/folder/to/backup"
-zipName = "NameOfTheZipFile"
+zipName = "NameOfTheZipFile"  # Optional: If not provided, folder name will be used
 ```
 
-You can add as many `[[pathAndDirName]]` sections as you want.
+You can add as many `[[pathAndDirName]]` sections as you want. For each section:
+- `path`: (required) Full path to the directory you want to back up
+- `zipName`: (optional) Name for the zip file. If not provided, the folder name from the path will be used
+
+Example:
+```toml
+# With explicit zipName (creates "documents.zip")
+[[pathAndDirName]]
+path = "/home/user/documents"
+zipName = "documents"
+
+# Without zipName (automatically creates "documents.zip")
+[[pathAndDirName]]
+path = "/home/user/documents"
+```
 
 2. Set the environment variable for rclone configuration:
    - For Bash/Zsh, add to your `.bashrc` or `.zshrc`:
