@@ -103,24 +103,31 @@ print("-"*30)
 
 path_compressed = os.path.join(os.getcwd(), "compressed")
 
-try:
-    remote = toml_data['config']['remote']
-    local = toml_data['config']['local']
-except KeyError:
-    print(RED+"[-] Error"+RESET_ALL+" - add 'remote' and 'local' to config file")
-    exit()
+def try_rclone_sync(path_compressed):
+    """Attempt to sync with rclone if configured"""
+    try:
+        remote = toml_data['config'].get('remote')
+        local = toml_data['config'].get('local')
+        
+        # Skip if rclone is not configured
+        if not remote or not local:
+            print(BLUE+"[-] Info:"+RESET_ALL+" Rclone sync skipped - remote/local not configured")
+            return
+            
+        config_pass = os.environ.get('RCLONE_CONFIG_PASS')
+        if config_pass is None:
+            print(BLUE+"[-] Info:"+RESET_ALL+" Rclone sync skipped - RCLONE_CONFIG_PASS not set")
+            return
+        
+        for r in remote:
+            os.system(f"echo {config_pass} | rclone copy {os.path.join(local, path_compressed)} {r} -P")
+            print(GREEN+"[+] "+RESET_ALL+"Uploaded to "+r)
+            
+    except Exception as e:
+        print(RED+f"[-] Rclone sync error: {str(e)}"+RESET_ALL)
 
-try:
-    config_pass = os.environ.get('RCLONE_CONFIG_PASS')
-    if config_pass is None:
-        raise EnvironmentError("RCLONE_CONFIG_PASS environment variable not set")
-    
-    for r in remote:
-        os.system(f"echo {config_pass} | rclone copy {os.path.join(local, path_compressed)} {r} -P")
-        print(GREEN+"[+] "+RESET_ALL+"Uploaded to "+r)
-
-except Exception as e:
-    print(RED+f"Uploading error: {str(e)}"+RESET_ALL)
+# Try to sync with rclone
+try_rclone_sync(path_compressed)
 
 # End timer
 ended = time.time()
