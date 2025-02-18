@@ -41,6 +41,10 @@ ALLWAYS_CREATE_ZIP = toml_data['config'].get('alwaysCompress', False)
 SHUTDOWN_AFTER = toml_data['config'].get('shutDownAfterBackup', False)
 PRESERVE_FULL_PATH = toml_data['config'].get('preserveFullPath', True)
 
+def get_preserve_full_path(directory_config):
+    """Get preserveFullPath setting for a directory, falling back to global setting"""
+    return directory_config.get('preserveFullPath', PRESERVE_FULL_PATH)
+
 # Creating folders if necessary
 for directory in ['compressed', 'logs']:
     if not os.path.exists(directory):

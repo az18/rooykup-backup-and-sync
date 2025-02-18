@@ -82,7 +82,7 @@ for p in toml_data['pathAndDirName']:
         for file in files:
             try:
                 file_path = os.path.join(root, file)
-                if PRESERVE_FULL_PATH:
+                if get_preserve_full_path(p):
                     archive.write(file_path)  # Keep full path structure
                 else:
                     # Remove the source_dir part from the path to only include target directory
