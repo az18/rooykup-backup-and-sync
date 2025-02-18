@@ -74,3 +74,25 @@ retentionDays = 30
 # Optional: Override global forceNewBackup setting for this directory
 # Don't create new backups if one exists from today
 forceNewBackup = false
+
+# Auto-backup configuration
+# This will automatically detect and backup all immediate subfolders
+[[autoBackup]]
+# Required: Parent directory to scan for subfolders
+parentPath = "/Users/user/dockers"
+
+# Optional: Prefix for zip file names of auto-detected folders
+# For example, with zipNamePrefix = "docker_", a subfolder "app1" will be backed up as "docker_app1"
+zipNamePrefix = "docker_"
+
+# Optional: Override global settings for auto-detected folders
+# These settings will apply to all subfolders found in parentPath
+preserveFullPath = true    # Override global preserveFullPath setting
+retentionDays = 14        # Override global retentionDays setting
+forceNewBackup = false    # Override global forceNewBackup setting
+
+# You can specify multiple parent directories to scan
+[[autoBackup]]
+parentPath = "/Users/user/projects"
+zipNamePrefix = "project_"    # Optional: Add prefix to all project backups
+# Uses global settings since no overrides specified

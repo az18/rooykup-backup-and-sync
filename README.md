@@ -84,7 +84,33 @@ preserveFullPath = true
 [[pathAndDirName]]
 path = "/home/user/pictures"
 zipName = "pictures"    # Uses global settings for forceNewBackup, retentionDays, and preserveFullPath
+
+# Automatic subfolder backup
+[[autoBackup]]
+parentPath = "/home/user/dockers"    # Required: Parent directory to scan
+zipNamePrefix = "docker_"            # Optional: Prefix for zip file names
+preserveFullPath = true             # Optional: Override global setting
+retentionDays = 14                 # Optional: Override global setting
 ```
+
+### Automatic Subfolder Backup
+The `[[autoBackup]]` section allows you to automatically backup all subfolders within a parent directory:
+- `parentPath`: (required) Directory to scan for subfolders
+- `zipNamePrefix`: (optional) Prefix to add to all zip file names (e.g., "docker_" will create "docker_folder1.zip")
+- `preserveFullPath`: (optional) Override global setting for all auto-detected folders
+- `retentionDays`: (optional) Override global setting for all auto-detected folders
+- `forceNewBackup`: (optional) Override global setting for all auto-detected folders
+
+You can have multiple `[[autoBackup]]` sections for different parent directories, each with its own settings and prefix. Global exclude rules from the `[exclude]` section apply to auto-detected folders as well.
+
+Example: Auto-backup all Docker projects
+```toml
+[[autoBackup]]
+parentPath = "/home/user/dockers"
+zipNamePrefix = "docker_"
+retentionDays = 14
+```
+This will automatically backup all subfolders of `/home/user/dockers`, adding "docker_" to the zip name and keeping backups for 14 days.
 
 2. Set the environment variable for rclone configuration:
    - For Bash/Zsh, add to your `.bashrc` or `.zshrc`:
