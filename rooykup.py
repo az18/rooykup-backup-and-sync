@@ -9,6 +9,13 @@ import glob
 import re
 from colors import *
 from config import *
+from logging_config import setup_logging
+
+# Get configured log level
+log_level = toml_data['config'].get('logLevel', 'INFO')
+
+# Initialize logger
+logger = setup_logging(log_level=log_level)
 
 today = datetime.date.today()
 
@@ -32,9 +39,9 @@ def cleanup_old_backups(directory_config):
             if backup_date < cutoff:
                 try:
                     os.remove(file)
-                    print(BLUE + "[-] Removed old backup: " + RESET_ALL + os.path.basename(file))
+                    logger.info(f"Removed old backup: {os.path.basename(file)}")
                 except Exception as e:
-                    print(RED + "[-] Error removing old backup: " + RESET_ALL + str(e))
+                    logger.error(f"Error removing old backup: {str(e)}")
 
 def system_shutdown():
     """Cross-platform system shutdown command"""
@@ -81,10 +88,7 @@ for p in toml_data['pathAndDirName']:
     
     # Check if directory is empty or not found
     if size_initial == 0:
-        string_to_log = f"- [ ] {zip_name_base} (0MB) - Directory empty or not found"
-        print(string_to_log[:string_to_log.find("-")]+RED+string_to_log[string_to_log.find("-"):]+RESET_ALL)
-        with open(os.path.join("logs", f"log-{str(today)}.md"), 'a') as f:
-            f.write(string_to_log+"\n")
+        logger.warning(f"{zip_name_base} (0MB) - Directory empty or not found")
         continue
 
     # Get directory-specific settings
@@ -96,29 +100,29 @@ for p in toml_data['pathAndDirName']:
     # Size of directory
     size_initial_mb = size_initial/(1024*1024)
     date_str = today.strftime("%Y-%m-%d")
-    
     # Debug info
-    print(BLUE+"[-] Debug: forceNewBackup setting =", force_new_backup, RESET_ALL)
+    logger.debug(f"forceNewBackup setting = {force_new_backup}")
     
     # Check existing backups from today
     pattern = f"{zip_name_base}_{date_str}_v*.zip"
     existing_backups = glob.glob(os.path.join("compressed", pattern))
     
-    print(BLUE+f"[-] Debug: Searching for: {pattern}", RESET_ALL)
-    print(BLUE+f"[-] Debug: Found backups: {[os.path.basename(f) for f in existing_backups]}", RESET_ALL)
+    logger.debug(f"Searching for: {pattern}")
+    logger.debug(f"Found backups: {[os.path.basename(f) for f in existing_backups]}")
     
     if existing_backups:
         latest_version = get_backup_version(zip_name_base, date_str) - 1
-        print(BLUE+f"[-] Debug: Latest version found: {latest_version}", RESET_ALL)
+        logger.debug(f"Latest version found: {latest_version}")
         
         if not force_new_backup:
-            print(f"- [x] {zip_name_base}_{date_str}_v{latest_version}.zip "+GREEN+"(Already created today)"+RESET_ALL)
+            logger.info(f"{zip_name_base}_{date_str}_v{latest_version}.zip (Already created today)")
             continue
+        logger.debug("forceNewBackup=true, creating new version")
         print(BLUE+"[-] Debug: forceNewBackup=true, creating new version", RESET_ALL)
     
     # Create new versioned backup
     version = get_backup_version(zip_name_base, date_str)
-    print(BLUE+f"[-] Creating version {version} for today"+RESET_ALL)
+    logger.info(f"Creating version {version} for today")
     zip_name = f"{zip_name_base}_{date_str}_v{version}.zip"
     zip_path = os.path.join("compressed", zip_name)
     
@@ -136,19 +140,16 @@ for p in toml_data['pathAndDirName']:
                     rel_path = os.path.relpath(file_path, os.path.dirname(source_dir))
                     archive.write(file_path, rel_path)
             except Exception as e:
-                print(RED+"[-] Error: "+RESET_ALL+f" Something went wrong with: {file} at {root} ({str(e)}) (Skipping)")
+                logger.error(f"Failed to backup file: {file} at {root} ({str(e)}) (Skipping)")
                 continue
     archive.close()
 
     # Size of ZIP
     size_final = os.path.getsize(zip_path)/(1024*1024)
     reduction = (size_initial_mb - size_final) / size_initial_mb * 100 if size_initial_mb > 0 else 0
-    out_str = f"- [x] {zip_name} ({size_initial_mb:.1f}MB => {size_final:.1f}MB, {reduction:.1f}% reduction)"
-
-    print(out_str[:out_str.find("(")]+GREEN+out_str[out_str.find("("):]+RESET_ALL)
-
-    with open(os.path.join("logs", f"log-{str(today)}.md"), 'a') as f:
-        f.write(out_str+"\n")
+    backup_stats = f"{zip_name} ({size_initial_mb:.1f}MB => {size_final:.1f}MB, {reduction:.1f}% reduction)"
+    
+    logger.info(backup_stats)
 
 print("-"*30)
 
@@ -162,20 +163,20 @@ def try_rclone_sync(path_compressed):
         
         # Skip if rclone is not configured
         if not remote or not local:
-            print(BLUE+"[-] Info:"+RESET_ALL+" Rclone sync skipped - remote/local not configured")
+            logger.info("Rclone sync skipped - remote/local not configured")
             return
             
         config_pass = os.environ.get('RCLONE_CONFIG_PASS')
         if config_pass is None:
-            print(BLUE+"[-] Info:"+RESET_ALL+" Rclone sync skipped - RCLONE_CONFIG_PASS not set")
+            logger.info("Rclone sync skipped - RCLONE_CONFIG_PASS not set")
             return
         
         for r in remote:
             os.system(f"echo {config_pass} | rclone copy {os.path.join(local, path_compressed)} {r} -P")
-            print(GREEN+"[+] "+RESET_ALL+"Uploaded to "+r)
+            logger.info(f"Uploaded to {r}")
             
     except Exception as e:
-        print(RED+f"[-] Rclone sync error: {str(e)}"+RESET_ALL)
+        logger.error(f"Rclone sync error: {str(e)}")
 
 # Try to sync with rclone
 try_rclone_sync(path_compressed)
@@ -190,16 +191,8 @@ if time_elapsed > 60:
     time_elapsed = time_elapsed/60
     time_var = "minutes"
 
-print("-"*30)
-print(BLUE+" ==> "+f"Total time elapsed: {time_elapsed:.2f} {time_var}"+RESET_ALL)
-
-log_file = os.path.join("logs", f"log-{str(today)}.md")
-with open(log_file, 'a') as f:
-    f.write("\n")
-    f.write("----\n")
-    f.write(f"## Time elapsed: {time_elapsed:.2f} {time_var}\n")
-
-print("-"*30)
+# Log completion time
+logger.info(f"Backup completed - Total time elapsed: {time_elapsed:.2f} {time_var}")
 
 if SHUTDOWN_AFTER:
     system_shutdown()

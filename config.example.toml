@@ -1,4 +1,8 @@
 [config]
+# Optional: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+# Default: INFO
+logLevel = "INFO"
+
 # Optional: Directory where compressed files and logs will be saved
 # Default: ~/backup
 workingDirectory = "~/backup"
